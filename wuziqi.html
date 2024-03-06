@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五子棋</title>
+    <style>
+        canvas {
+            background-color: #c0723f;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .tip {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 800;
+        document.body.append(canvas);
+
+        let context = canvas.getContext('2d');
+
+        let board = [];
+        let isBlack = true;
+
+        initGame();
+        canvas.addEventListener("click", (e) => {
+
+            // 解构
+            let { offsetX, offsetY } = e;
+
+            // 棋盘索引位置
+            let i = Math.floor((offsetX + 25) / 50);
+            let j = Math.floor((offsetY + 25) / 50);
+
+            // 合法检查
+            if (outOfBound(offsetX, offsetY) || exist(i, j)) {
+                return;
+            }
+
+            // 绘制棋子
+            drawPiece(i, j);
+
+            // 是否获胜
+            if (won()) {
+                setTimeout(() => {
+                    alert(`${isBlack ? "白" : "黑"}棋获胜，刷新页面重新开始游戏`);
+                }, 50);
+            }
+
+            // 改变颜色
+            changeColor();
+        });
+
+        function initGame() {
+            for (let i = 1; i <= 15; i++) {
+                context.moveTo(50, 50 * i);
+                context.lineTo(750, 50 * i);
+                context.stroke();
+
+                context.moveTo(50 * i, 50);
+                context.lineTo(50 * i, 750);
+                context.stroke();
+
+                board[i] = [];
+            }
+        }
+
+        function outOfBound(x, y) {
+            if (x < 25 || y < 25 || x > 775 || y > 775) {
+                return true;
+            }
+            return false;
+        }
+        function exist(i, j) {
+            if (board[i][j]) {
+                return true;
+            }
+            return false;
+        }
+        function drawPiece(i, j) {
+            doDraw(i * 50, j * 50);
+            savePiece(i, j);
+        }
+
+        function doDraw(x, y) {
+            context.beginPath();
+            context.arc(x, y, 23, 0, 2 * Math.PI);
+
+            let tx = isBlack ? x - 10 : x + 10
+            let ty = isBlack ? y - 10 : y + 10;
+
+            let g = context.createRadialGradient(tx, ty, 0, tx, ty, 30);
+            g.addColorStop(0, isBlack ? '#ccc' : '#666');
+            g.addColorStop(1, isBlack ? '#000' : '#fff');
+            context.fillStyle = g;
+
+            // 设置阴影美化棋子
+            context.shadowBlur = 4;
+            context.shadowColor = '#333';
+            context.shadowOffsetX = 4;
+            context.shadowOffsetY = 4;
+            context.fill();
+            context.closePath();
+        }
+
+        function savePiece(i, j) {
+            board[i][j] = color;
+        }
+
+        function changeColor() {
+            isBlack = !isBlack;
+        }
+
+        let color = isBlack ? '黑色' : '白色'
+        function won() {
+            for (let i = 1; i <= 15; i++) {
+                for (let j = 1; j <= 15; j++) {
+                    // 水平
+                    if (
+                        i <= 11 &&
+                        board[i][j] === color &&
+                        board[i + 1][j] === color &&
+                        board[i + 2][j] === color &&
+                        board[i + 3][j] === color &&
+                        board[i + 4][j] === color
+                    ) {
+                        return true;
+                    }
+                    // 垂直
+                    if (
+                        j <= 11 &&
+                        board[i][j] === color &&
+                        board[i][j + 1] === color &&
+                        board[i][j + 2] === color &&
+                        board[i][j + 3] === color &&
+                        board[i][j + 4] === color
+                    ) {
+                        return true;
+                    }
+                    // 右下
+                    if (
+                        i <= 11 &&
+                        j <= 11 &&
+                        board[i][j] === color &&
+                        board[i + 1][j + 1] === color &&
+                        board[i + 2][j + 2] === color &&
+                        board[i + 3][j + 3] === color &&
+                        board[i + 4][j + 4] === color
+                    ) {
+                        return true;
+                    }
+                    // 左下
+                    if (
+                        i >= 5 &&
+                        j <= 11 &&
+                        board[i][j] === color &&
+                        board[i - 1][j + 1] === color &&
+                        board[i - 2][j + 2] === color &&
+                        board[i - 3][j + 3] === color &&
+                        board[i - 4][j + 4] === color
+                    ) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    </script>
+</body>
+
+</html>
