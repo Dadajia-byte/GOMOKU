@@ -11,30 +11,20 @@
             display: block;
             margin: 0 auto;
         }
-
-        .tip {
-            text-align: center;
-            padding: 20px;
-        }
     </style>
 </head>
 
 <body>
+    <canvas id="canvas" width="800" height="800"></canvas>
     <script>
-
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 800;
-        document.body.append(canvas);
-
-        let context = canvas.getContext('2d');
+        let canvas = document.getElementById("canvas");
+        let context = canvas.getContext("2d");
 
         let board = [];
-        let isBlack = true;
+        let color = "black";
 
         initGame();
         canvas.addEventListener("click", (e) => {
-
             // 解构
             let { offsetX, offsetY } = e;
 
@@ -53,7 +43,7 @@
             // 是否获胜
             if (won()) {
                 setTimeout(() => {
-                    alert(`${isBlack ? "白" : "黑"}棋获胜，刷新页面重新开始游戏`);
+                    alert(`${color === "black" ? "黑" : "白"}棋获胜，请刷新重开`);
                 }, 50);
             }
 
@@ -96,12 +86,12 @@
             context.beginPath();
             context.arc(x, y, 23, 0, 2 * Math.PI);
 
-            let tx = isBlack ? x - 10 : x + 10
-            let ty = isBlack ? y - 10 : y + 10;
+            let tx = color === "black" ? x - 10 : x + 10
+            let ty = color === "black" ? y - 10 : y + 10;
 
             let g = context.createRadialGradient(tx, ty, 0, tx, ty, 30);
-            g.addColorStop(0, isBlack ? '#ccc' : '#666');
-            g.addColorStop(1, isBlack ? '#000' : '#fff');
+            g.addColorStop(0, color === "black" ? '#ccc' : '#666');
+            g.addColorStop(1, color === "black" ? '#000' : '#fff');
             context.fillStyle = g;
 
             // 设置阴影美化棋子
@@ -118,10 +108,9 @@
         }
 
         function changeColor() {
-            isBlack = !isBlack;
+            color = color === "black" ? "white" : "black";
         }
 
-        let color = isBlack ? '黑色' : '白色'
         function won() {
             for (let i = 1; i <= 15; i++) {
                 for (let j = 1; j <= 15; j++) {
